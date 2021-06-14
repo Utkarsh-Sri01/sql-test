@@ -15,18 +15,21 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(QueryExecutionException.class)
     protected ResponseEntity<ApiError> handleQueryExecutionException(Exception ex) {
+        logger.info("Exception occur while executing user query");
         ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, ex.getMessage());
         return new ResponseEntity(apiError, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(SubmitTestException.class)
     protected ResponseEntity<ApiError> handleSubmitTestException(Exception ex) {
+        logger.info("Exception occur while submitting test");
         ApiError apiError = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, SUBMIT_ERROR_MSG);
         return new ResponseEntity(apiError, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(SaveUserException.class)
     protected ResponseEntity<ApiError> handleSaveUserException(Exception ex) {
+        logger.info("Exception occur while creating user");
         ApiError apiError = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR, START_TEST_ERROR_MSG);
         return new ResponseEntity(apiError, HttpStatus.INTERNAL_SERVER_ERROR);
     }

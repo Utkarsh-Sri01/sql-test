@@ -8,6 +8,8 @@ import com.sql.test.model.SqlQuery;
 import com.sql.test.model.SqlTestUser;
 import com.sql.test.service.SqlTestService;
 import io.swagger.annotations.Api;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,24 +25,19 @@ public class SqlTestController {
 
     @PostMapping("/")
     public ResponseEntity createUser(@RequestBody SqlTestUser user) {
-
         sqlTestService.save(user);
         return ResponseEntity.status(HttpStatus.CREATED).build();
-
     }
 
     @PostMapping("/executeQuery")
     public JsonNode executeQuery(@RequestBody SqlQuery query) {
-
         ResponseEntity responseEntity = new ResponseEntity(HttpStatus.OK);
         ObjectNode jsonNode = JsonNodeFactory.instance.objectNode();
         return sqlTestService.executeQuery(query.getQuery());
-
     }
 
     @GetMapping("/startTest")
     public JsonNode startTest() {
-
         JsonNode sqlTestQuestion = sqlTestService.getSqlTestQuestion();
         return sqlTestQuestion;
 
