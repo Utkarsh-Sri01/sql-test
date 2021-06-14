@@ -6,11 +6,14 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.sql.test.Constants;
+import com.sql.test.controller.SqlTestController;
 import com.sql.test.customexception.QueryExecutionException;
 import com.sql.test.customexception.SubmitTestException;
 import com.sql.test.dao.SqlTestDao;
 import com.sql.test.model.SqlQuery;
 import com.sql.test.model.SqlTestUser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.NestedExceptionUtils;
@@ -20,7 +23,6 @@ import org.springframework.util.StopWatch;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 @Service
 public class SqlTestServiceImpl implements SqlTestService {
@@ -43,6 +45,7 @@ public class SqlTestServiceImpl implements SqlTestService {
     @Value("${query.getUser}")
     private String user;
 
+    private static final Logger logger= LoggerFactory.getLogger(SqlTestServiceImpl.class);
     private static final String IS_OUTPUT_MATCH = "isOutPutMatches";
     private static final String QUESTION = "questions";
     private static final String TABLE_NAME = "tableName";
@@ -51,20 +54,24 @@ public class SqlTestServiceImpl implements SqlTestService {
 
     @Override
     public void save(SqlTestUser user) {
+        logger.info("Start creating user");
         boolean isUserExists = checkIfUserExists(user.getEmailId());
         if (!isUserExists) {
             sqlTestDao.save(user);
         }
+        logger.info("User created successfully");
     }
 
     @Override
     public JsonNode executeQuery(String query) {
         try {
             ObjectNode jsonNode = JsonNodeFactory.instance.objectNode();
+            logger.info("start executing user query");
             Object queryResult = sqlTestDao.executeQuery(query);
             jsonNode.putPOJO(Constants.DATA, queryResult);
             boolean isMatch = checkIfOutputMatches((List<Map<String, Object>>) queryResult);
             jsonNode.put(IS_OUTPUT_MATCH, isMatch);
+            logger.info("user query executed successfully");
             return jsonNode;
 
         } catch (Exception e) {
@@ -78,6 +85,7 @@ public class SqlTestServiceImpl implements SqlTestService {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode questionJsonNode = mapper.convertValue(sqlTestDao.getSqlQuestion(questions), JsonNode.class);
         ArrayNode arrayNode = JsonNodeFactory.instance.arrayNode();
+        logger.info("fetch sql question details");
         for (String tName : tableList) {
             ObjectNode objectNodeTab = JsonNodeFactory.instance.objectNode();
 
@@ -89,6 +97,8 @@ public class SqlTestServiceImpl implements SqlTestService {
         }
         result.putPOJO(QUESTION, questionJsonNode);
         result.putPOJO(TABLES, arrayNode);
+
+        logger.info("sql question details fetched successfully");
         return result;
     }
 
@@ -96,12 +106,12 @@ public class SqlTestServiceImpl implements SqlTestService {
     public Object submitTest(SqlQuery sqlQuery) {
 
         try {
+            logger.info("submit test");
             boolean isMatch = checkIfOutputMatches((List<Map<String, Object>>) sqlTestDao.executeQuery(sqlQuery.getQuery()));
             long execTime = getQueryExecutionTime(sqlQuery.getQuery());
             sqlTestDao.submitResponse(sqlQuery, execTime, isMatch);
-            //TODO:  Add logger if required
+            logger.info("Test submitted successfully");
         } catch (Exception e) {
-            e.printStackTrace();
             throw new SubmitTestException(NestedExceptionUtils.getMostSpecificCause(e).getMessage());
         }
         return SUCCESS_MESSAGE;
@@ -128,6 +138,7 @@ public class SqlTestServiceImpl implements SqlTestService {
         for (Map<String, Object> k : queryResult) {
             queryValues.addAll(k.values());
         }
+        logger.info("check if user query output matches with expected output");
         isMatch = values.equals(queryValues);
         return isMatch;
     }
@@ -140,6 +151,7 @@ public class SqlTestServiceImpl implements SqlTestService {
         for (Map<String, Object> k : userList) {
             users.addAll(k.values());
         }
+        logger.info("checking if user exists");
         if (users.contains(emailId)) {
             isUserExist = true;
         }
