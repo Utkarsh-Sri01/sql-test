@@ -33,7 +33,7 @@ class SqlTestApplicationTests {
     @Test
     public void testCreateUserThenStatus201() throws Exception {
 
-        mockMvc.perform(post("/")
+        mockMvc.perform(post("/createUser")
                 .content(asJsonString(new SqlTestUser("utty@gmail.com")))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
@@ -43,7 +43,7 @@ class SqlTestApplicationTests {
     @Test
     public void testCreateUserException500() throws Exception {
 
-        mockMvc.perform(post("/")
+        mockMvc.perform(post("/createUser")
                 .content(asJsonString(new SqlTestUser(null)))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))

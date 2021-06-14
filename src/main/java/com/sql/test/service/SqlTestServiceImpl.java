@@ -27,6 +27,8 @@ import java.util.Map;
 @Service
 public class SqlTestServiceImpl implements SqlTestService {
 
+    private final Logger logger= LoggerFactory.getLogger(getClass());
+
     @Autowired
     SqlTestDao sqlTestDao;
 
@@ -45,7 +47,7 @@ public class SqlTestServiceImpl implements SqlTestService {
     @Value("${query.getUser}")
     private String user;
 
-    private static final Logger logger= LoggerFactory.getLogger(SqlTestServiceImpl.class);
+
     private static final String IS_OUTPUT_MATCH = "isOutPutMatches";
     private static final String QUESTION = "questions";
     private static final String TABLE_NAME = "tableName";

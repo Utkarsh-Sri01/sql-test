@@ -8,22 +8,21 @@ import com.sql.test.model.SqlQuery;
 import com.sql.test.model.SqlTestUser;
 import com.sql.test.service.SqlTestService;
 import io.swagger.annotations.Api;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@CrossOrigin("http://localhost:3000")
-@Api(description = "New Sql Type Test" , tags="SQL test")
+@CrossOrigin
+@Api(description = "New Sql Type Test", tags = "SQL test")
 @RestController
 public class SqlTestController {
 
     @Autowired
     SqlTestService sqlTestService;
 
-    @PostMapping("/")
+
+    @PostMapping("/createUser")
     public ResponseEntity createUser(@RequestBody SqlTestUser user) {
         sqlTestService.save(user);
         return ResponseEntity.status(HttpStatus.CREATED).build();
